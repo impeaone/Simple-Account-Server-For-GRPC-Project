@@ -1,0 +1,30 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    #command: redis-server --appendonly yes
+    networks:
+      - grpc-chat
+
+  account_service:
+    env_file:
+      - .env
+    build: .
+    container_name: account_service
+    ports:
+      - "13961:13961"
+    depends_on:
+      - redis
+    networks:
+      - grpc-chat
+
+volumes:
+  redis_data:
+
+networks:
+  grpc-chat:
+    driver: bridge

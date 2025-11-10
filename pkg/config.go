@@ -4,15 +4,23 @@ import (
 	consts "GrpcMessangerAccServer/pkg/constants"
 	"gopkg.in/yaml.v3"
 	"os"
+	"runtime"
 )
 
 type Config struct {
-	Port      string `yaml:"Port"` // Порт: перемножение букв в ascii деленное на количество букв умнож. на 10 (auth -> 13961)
+	Port      string `yaml:"Port"`
 	IPAddress string `yaml:"IPAddress"`
 }
 
 func ReadConfig() *Config {
-	ConfPath := consts.ConfigPath
+	var ConfPath string
+	if runtime.GOOS == "windows" {
+		ConfPath = consts.ConfigPathWindows
+	} else if runtime.GOOS == "linux" {
+		ConfPath = consts.ConfigPathLinux
+	} else {
+		ConfPath = consts.ConfigPathLinux // Ну там, дааа, пока что так
+	}
 	bytes, err := os.ReadFile(ConfPath)
 	if err != nil {
 		panic(err)

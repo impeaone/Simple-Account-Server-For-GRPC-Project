@@ -2,7 +2,9 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"github.com/redis/go-redis/v9"
+	"os"
 	"time"
 )
 
@@ -13,9 +15,18 @@ type LoginTracker struct {
 }
 
 func NewLoginTracker() (*LoginTracker, error) {
+	redisHost := os.Getenv("REDIS_HOST")
+	if redisHost == "" {
+		redisHost = "redis" // для докера
+	}
+	redisPort := os.Getenv("REDIS_PORT")
+	if redisPort == "" {
+		redisPort = "6379"
+	}
+	redisAddr := fmt.Sprintf("%s:%s", redisHost, redisPort)
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
+		Addr:     redisAddr,
+		Password: os.Getenv("REDIS_PASSWORD"), // Если нет, вернет ""
 		DB:       0,
 	})
 	ctx := context.Background()
